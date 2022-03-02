@@ -3,9 +3,19 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var mongoose = require('mongoose');
+var config = require('./database/db.json');
 
+mongoose.connect(
+  config.mongo.uri,
+  ()=> { console.log("Connected to DATABASE")});
+  
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var appointmentsRouter = require('./routes/appointments');
+var reclamationRouter = require('./routes/reclamations');
+var reviewRouter = require('./routes/reviews');
+
 
 var app = express();
 
