@@ -2,10 +2,12 @@ var mongoose  = require('mongoose');
 var Schema = mongoose.Schema;
 
 var Reclamation = new Schema({
-    date : String,
+    date : Date,
     description: String,
-    patient:
-        {type: Schema.Types.ObjectId, ref: 'users'}
+    patient :
+        { type: Schema.Types.ObjectId, ref: 'users' },
+    doctor : 
+         { type: Schema.Types.ObjectId, ref: 'users' } 
       
 
 });

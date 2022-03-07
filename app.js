@@ -5,19 +5,21 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var mongoose = require('mongoose');
 var config = require('./database/db.json');
+var cors = require('cors')
 
 mongoose.connect(
   config.mongo.uri,
   ()=> { console.log("Connected to DATABASE")});
   
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var appointmentsRouter = require('./routes/appointments');
-var reclamationRouter = require('./routes/reclamations');
-var reviewRouter = require('./routes/reviews');
+var indexRouter = require('./routes/indexRoutes');
+var usersRouter = require('./routes/usersRoutes');
+var appointmentsRouter = require('./routes/appointmentsRoutes');
+var reclamationRouter = require('./routes/reclamationsRoutes');
+var reviewRouter = require('./routes/reviewsRoutes');
 
 
 var app = express();
+app.use(cors())
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
