@@ -11,7 +11,8 @@ var User = new Schema({
     birthDate : Date ,
     sex : String , 
     Adress : String ,
-    premium : Boolean
+    premium : Boolean , 
+    speciality : string 
 });
 
 module.exports = mongoose.model('users', User);
