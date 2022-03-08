@@ -1,6 +1,6 @@
 {
     "mongo" : {
-        "uri" : "mongodb://localhost:27017/exempledbs"
+        "uri" : "mongodb+srv://test:test@cluster0.sc4kb.mongodb.net/Tbibi"
     }
 }
 
