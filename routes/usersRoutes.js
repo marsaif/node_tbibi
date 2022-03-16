@@ -31,8 +31,12 @@ router.post('/', function(req, res, next) {
 router.get("/:id",function(req, res, next) {
   id = req.params.id ;
   console.log(id) ; 
-  User.findById(id,(err,data) => console.log(data));
-  res.send("test")
+  User.findById(id,(err,data) => 
+  {
+    console.log(data)
+    res.send(data)
+  }
+  );
 }) ;
 
 router.put("/:id",function(req, res, next) {
