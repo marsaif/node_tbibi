@@ -17,6 +17,7 @@ var appointmentsRouter = require('./routes/appointmentsRoutes');
 var reclamationRouter = require('./routes/reclamationsRoutes');
 var reviewRouter = require('./routes/reviewsRoutes');
 var medicalRecordRouter = require('./routes/medicalRecordRoutes');
+var PaymentRoutes = require('./routes/PaymentRoutes');
 
 
 var app = express();
@@ -38,6 +39,7 @@ app.use("/appointments",appointmentsRouter)
 app.use("/reviews",reviewRouter)
 app.use("/reclamations",reclamationRouter)
 app.use("/medicalrecord",medicalRecordRouter)
+app.use("/payments",PaymentRoutes)
 
 
 // catch 404 and forward to error handler
