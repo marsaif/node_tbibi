@@ -21,6 +21,9 @@ router.post('/', function(req, res, next) {
       role: req.body.role ,
       birthDate: req.body.birthDate ,
       sex: req.body.sex ,
+      Adress: req.body.Adress ,
+      premium: req.body.premium ,
+
     }
     );
   user.save().then();
