@@ -12,7 +12,7 @@ var User = new Schema({
     sex : String , 
     Adress : String ,
     premium : Boolean , 
-    speciality : String 
+    speciality : String ,
 });
 
 module.exports = mongoose.model('users', User);

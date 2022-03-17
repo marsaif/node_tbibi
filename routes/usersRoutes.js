@@ -21,6 +21,9 @@ router.post('/', function(req, res, next) {
       role: req.body.role ,
       birthDate: req.body.birthDate ,
       sex: req.body.sex ,
+      Adress: req.body.Adress ,
+      premium: req.body.premium ,
+
     }
     );
   user.save().then();
@@ -31,8 +34,12 @@ router.post('/', function(req, res, next) {
 router.get("/:id",function(req, res, next) {
   id = req.params.id ;
   console.log(id) ; 
-  User.findById(id,(err,data) => console.log(data));
-  res.send("test")
+  User.findById(id,(err,data) => 
+  {
+    console.log(data)
+    res.send(data)
+  }
+  );
 }) ;
 
 router.put("/:id",function(req, res, next) {
