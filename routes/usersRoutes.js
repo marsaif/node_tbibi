@@ -5,10 +5,12 @@ const passport = require("passport");
 const bcrypt = require('bcryptjs');
 const user = require('../models/user');
 const jwt = require('jsonwebtoken')
+const { ROLES, inRole } = require("../security/Rolemiddleware");
 
 
 /* GET users listing. */
-router.get('/', passport.authenticate("jwt", { session: false }), function (req, res, next) {
+router.get('/', passport.authenticate("jwt", { session: false }), inRole(ROLES.ADMIN),
+function (req, res, next) {
   User.find({}, function (err, users) {
     res.send(users)
   });
@@ -24,7 +26,6 @@ router.post('/', function (req, res, next) {
     } else {
       const hash = bcrypt.hashSync(req.body.password, 10) //hashed password
       req.body.password = hash;
-      req.body.role = "USER";
       const user = new User(
         {
           firstName: req.body.firstName,
