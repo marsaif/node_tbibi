@@ -6,6 +6,8 @@ var logger = require('morgan');
 var mongoose = require('mongoose');
 var config = require('./database/db.json');
 var cors = require('cors')
+const passport = require('passport')
+require('dotenv').config()
 
 mongoose.connect(
   config.mongo.uri,
@@ -41,6 +43,9 @@ app.use("/reclamations",reclamationRouter)
 app.use("/medicalrecord",medicalRecordRouter)
 app.use("/payments",PaymentRoutes)
 
+
+app.use(passport.initialize())
+require('./security/passport')(passport)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
