@@ -4,7 +4,11 @@ var Schema = mongoose.Schema;
 var User = new Schema({
     firstName : String,
     lastName : String,
-    email : String,
+    email: {
+        type: "string",
+        trim: true,
+        unique: true,
+      },
     password : String,
     phone : Number,
     role : String,
@@ -12,7 +16,7 @@ var User = new Schema({
     sex : String , 
     Adress : String ,
     premium : Boolean , 
-    speciality : String 
+    speciality : String ,
 });
 
 module.exports = mongoose.model('users', User);

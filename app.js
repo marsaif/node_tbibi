@@ -8,6 +8,8 @@ var config = require('./database/db.json');
 var cors = require('cors')
 var io = require('./socket')
 
+const passport = require('passport')
+require('dotenv').config()
 
 mongoose.connect(
   config.mongo.uri,
@@ -18,6 +20,8 @@ var usersRouter = require('./routes/usersRoutes');
 var appointmentsRouter = require('./routes/appointmentsRoutes');
 var reclamationRouter = require('./routes/reclamationsRoutes');
 var reviewRouter = require('./routes/reviewsRoutes');
+var medicalRecordRouter = require('./routes/medicalRecordRoutes');
+var PaymentRoutes = require('./routes/PaymentRoutes');
 
 
 var app = express();
@@ -38,7 +42,12 @@ app.use('/users', usersRouter);
 app.use("/appointments",appointmentsRouter)
 app.use("/reviews",reviewRouter)
 app.use("/reclamations",reclamationRouter)
+app.use("/medicalrecord",medicalRecordRouter)
+app.use("/payments",PaymentRoutes)
 
+
+app.use(passport.initialize())
+require('./security/passport')(passport)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
