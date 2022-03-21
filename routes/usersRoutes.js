@@ -8,8 +8,7 @@ const jwt = require('jsonwebtoken')
 const { ROLES, inRole } = require("../security/Rolemiddleware");
 const ValidateRegister = require("../validation/Register");
 const ValidateLogin = require("../validation/Login");
-
-
+var mailer =  require('../utils/mailer')
 
 
 /* GET users listing. */
@@ -49,8 +48,14 @@ router.post('/', function (req, res, next) {
 
             }
           );
-          user.save().then();
-          res.send('user saved');
+          user.save().then((user)=>{
+            const verificationToken = user.generateVerificationToken();
+            mailer.sendVerifyMail("bensalem.wael@esprit.tn",verificationToken)
+
+            res.send("user added");
+            
+          });
+          
 
         }
       })
@@ -97,6 +102,10 @@ router.post("/login", (req, res, next) => {
           if (!user) {
             res.status(400).json( {message:"user not found"})
           } else {
+            if(!user.verified)
+            {
+              res.status(400).json({message:"Account not verified"})
+            }
             bcrypt.compare(req.body.password, user.password)
               .then(isMatch => {
                 if (!isMatch) {
@@ -122,5 +131,25 @@ router.post("/login", (req, res, next) => {
   }
 
 })
+
+
+router.post('/active',
+  function (req, res, next) {
+    let payload = null
+    try {
+        payload = jwt.verify(
+           req.body.token,
+           process.env.USER_VERIFICATION_TOKEN_SECRET
+        );
+        console.log(payload.ID)
+          User.findOneAndUpdate({_id:payload.ID} , {verified:true},(err, data) => {
+
+            res.send("user verified");
+          } )
+      } catch (err) {
+        return res.status(500).send(err);
+    }
+
+  });
 
 module.exports = router;
