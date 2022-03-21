@@ -29,6 +29,23 @@ io.on("connection", (socket) => {
     socket.to(data.room).emit("receive_message", data);
   });
 
+  socket.on("user_typing", (data) => {
+    socket.to(data.room).emit("receive_typing", data);
+  });
+
+
+
+  // video chat socket 
+
+  socket.on("callUser", (data) => {
+    socket.to(data.userToCall).emit('hey', {signal: data.signalData, from: data.from});
+  })
+
+  socket.on("acceptCall", (data) => {
+    socket.to(data.to).emit('callAccepted', data.signal);
+  })
+
+
   socket.on("disconnect", () => {
     console.log("User Disconnected", socket.id);
   });
