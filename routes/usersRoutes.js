@@ -9,6 +9,7 @@ const { ROLES, inRole } = require("../security/Rolemiddleware");
 const ValidateRegister = require("../validation/Register");
 const ValidateLogin = require("../validation/Login");
 var mailer =  require('../utils/mailer')
+const { v4: uuidv4 } = require('uuid');
 
 
 /* GET users listing. */
@@ -50,7 +51,7 @@ router.post('/', function (req, res, next) {
           );
           user.save().then((user)=>{
             const verificationToken = user.generateVerificationToken();
-            mailer.sendVerifyMail("bensalem.wael@esprit.tn",verificationToken)
+            mailer.sendVerifyMail(user.email,verificationToken)
 
             res.send("user added");
             
@@ -151,5 +152,65 @@ router.post('/active',
     }
 
   });
+
+
+
+  router.post('/restpassword',
+  function (req, res, next) {
+    
+    const email = req.body.email
+
+    User.findOne({email:email})
+    .then(user => {
+      if(!user)
+      {
+        res.status(404).json({message:"user exist"});
+      }
+      const restpassword = uuidv4()
+      user.restpassword=restpassword
+      user.save()
+      mailer.ChangePassword(user.email,user.restpassword)
+      res.send("email send")
+    })
+    
+  });
+
+
+  router.post('/verify-restpassword',
+  function (req, res, next) {
+    
+    const restpassword = req.body.restpassword
+
+    User.findOne({restpassword:restpassword})
+    .then(user => {
+      if(!user)
+      {
+        res.status(400).json({message:"user not found "})
+      }
+      user.restpassword=""
+      user.save()
+      res.send({id:user.id})
+    })
+    
+  });
+
+
+  
+  router.post('/update-password',
+  function (req, res, next) {
+    
+    const {id,password} = req.body
+
+    const hash = bcrypt.hashSync(password, 10) //hashed password
+
+    User.findByIdAndUpdate({_id:id},{password:hash})
+    .exec()
+
+   
+    res.send("password changed")
+    
+  });
+
+
 
 module.exports = router;

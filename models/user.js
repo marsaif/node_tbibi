@@ -15,14 +15,15 @@ var User = new Schema({
     role : String,
     birthDate : Date ,
     sex : String , 
-    Adress : String ,
+    adress : String ,
     premium : Boolean , 
     speciality : String ,
     verified: {
       type: Boolean,
       required: true,
       default: false
-  }
+  },
+  restpassword : String
 });
 
 User.methods.generateVerificationToken = function () {
