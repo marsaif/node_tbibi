@@ -22,15 +22,14 @@ router.get('/', passport.authenticate("jwt", { session: false }), inRole(ROLES.A
 
 router.post('/', function (req, res, next) {
 
-  const { errors, isValid } = ValidateRegister(req.body);
+  const {  isValid } = ValidateRegister(req.body);
   try {
     if (!isValid) {
-      res.status(404).json(errors);
+      res.status(404).json({message:"invalid data"});
     } else {
       user.findOne({ email: req.body.email }).then(async (exist) => {
         if (exist) {
-          errors.email = "user exist";
-          res.status(404).json(errors);
+          res.status(404).json({message:"user exist"});
         } else {
           const hash = bcrypt.hashSync(req.body.password, 10) //hashed password
           req.body.password = hash;
@@ -44,8 +43,9 @@ router.post('/', function (req, res, next) {
               role: req.body.role,
               birthDate: req.body.birthDate,
               sex: req.body.sex,
-              Adress: req.body.Adress,
+              adress: req.body.adress,
               premium: req.body.premium,
+              speciality: req.body.speciality
 
             }
           );
@@ -56,7 +56,7 @@ router.post('/', function (req, res, next) {
       })
     }
   } catch (error) {
-    res.status(404).json(error.message);
+    res.status(404).json({message:"error"});
   }
 });
 
@@ -87,22 +87,20 @@ router.delete('/:id', function (req, res, next) {
 });
 
 router.post("/login", (req, res, next) => {
-  const { errors, isValid } = ValidateLogin(req.body);
+  const { isValid } = ValidateLogin(req.body);
   try {
     if (!isValid) {
-      res.status(404).json(errors);
+      res.status(400).json({message:"invalid data"});
     } else {
       user.findOne({ email: req.body.email })
         .then(user => {
           if (!user) {
-            errors.email = "not found user"
-            res.status(404).json(errors)
+            res.status(400).json( {message:"user not found"})
           } else {
             bcrypt.compare(req.body.password, user.password)
               .then(isMatch => {
                 if (!isMatch) {
-                  errors.password = "incorrect password"
-                  res.status(404).json(errors)
+                  res.status(400).json({message:"incorrect password"})
                 } else {
                   var token = jwt.sign({
                     id: user._id,
@@ -111,8 +109,8 @@ router.post("/login", (req, res, next) => {
                     role: user.role
                   }, process.env.PRIVATE_KEY, { expiresIn: '1h' });
                   res.status(200).json({
-                    message: "success",
-                    token: "Bearer " + token
+                    accessToken: token,
+                    user: user
                   })
                 }
               })
