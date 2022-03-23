@@ -12,6 +12,12 @@ var mailer =  require('../utils/mailer')
 const { v4: uuidv4 } = require('uuid');
 
 
+
+router.get('/getUser', passport.authenticate("jwt", { session: false }),
+function (req, res, next) {
+  res.json({"user":req.user})
+});
+
 /* GET users listing. */
 router.get('/', passport.authenticate("jwt", { session: false }), inRole(ROLES.ADMIN),
   function (req, res, next) {
@@ -117,7 +123,7 @@ router.post("/login", (req, res, next) => {
                     firstName: user.firstName,
                     email: user.email,
                     role: user.role
-                  }, process.env.PRIVATE_KEY, { expiresIn: '1h' });
+                  }, process.env.PRIVATE_KEY, { expiresIn: '24h' });
                   res.status(200).json({
                     accessToken: token,
                     user: user
@@ -212,5 +218,11 @@ router.post('/active',
   });
 
 
+  router.get('/a', passport.authenticate("jwt", { session: false }), inRole(ROLES.ADMIN),
+  function (req, res, next) {
+    User.find({}, function (err, users) {
+      res.send(users)
+    });
+  });
 
 module.exports = router;
