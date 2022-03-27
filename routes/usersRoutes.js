@@ -12,92 +12,6 @@ var mailer =  require('../utils/mailer')
 const { v4: uuidv4 } = require('uuid');
 
 
-
-router.get('/getUser', passport.authenticate("jwt", { session: false }),
-function (req, res, next) {
-  res.json({"user":req.user})
-});
-
-/* GET users listing. */
-router.get('/', passport.authenticate("jwt", { session: false }), inRole(ROLES.ADMIN),
-  function (req, res, next) {
-    User.find({}, function (err, users) {
-      res.send(users)
-    });
-  });
-
-router.post('/', function (req, res, next) {
-
-  const {  isValid } = ValidateRegister(req.body);
-  try {
-    if (!isValid) {
-      res.status(404).json({message:"invalid data"});
-    } else {
-      user.findOne({ email: req.body.email }).then(async (exist) => {
-        if (exist) {
-          res.status(404).json({message:"user exist"});
-        } else {
-          const hash = bcrypt.hashSync(req.body.password, 10) //hashed password
-          req.body.password = hash;
-          const user = new User(
-            {
-              firstName: req.body.firstName,
-              lastName: req.body.lastName,
-              email: req.body.email,
-              password: req.body.password,
-              phone: req.body.phone,
-              role: req.body.role,
-              birthDate: req.body.birthDate,
-              sex: req.body.sex,
-              adress: req.body.adress,
-              premium: req.body.premium,
-              speciality: req.body.speciality
-
-            }
-          );
-          user.save().then((user)=>{
-            const verificationToken = user.generateVerificationToken();
-            mailer.sendVerifyMail(user.email,verificationToken)
-
-            res.send("user added");
-            
-          });
-          
-
-        }
-      })
-    }
-  } catch (error) {
-    res.status(404).json({message:"error"});
-  }
-});
-
-
-router.get("/:id", function (req, res, next) {
-  id = req.params.id;
-  console.log(id);
-  User.findById(id, (err, data) => {
-    console.log(data)
-    res.send(data)
-  }
-  );
-});
-
-router.put("/:id", function (req, res, next) {
-  id = req.params.id;
-  firstName = req.body.firstName
-  User.findByIdAndUpdate(id, { firstName: firstName }, (err, data) => {
-    res.send("data updated");
-  });
-});
-
-router.delete('/:id', function (req, res, next) {
-  id = req.params.id;
-  User.findByIdAndDelete(id, (err, data) => {
-    res.send("data deleted" + data);
-  });
-});
-
 router.post("/login", (req, res, next) => {
   const { isValid } = ValidateLogin(req.body);
   try {
@@ -217,12 +131,110 @@ router.post('/active',
     
   });
 
+  
+router.put("/profile", passport.authenticate("jwt", { session: false }),
+ function (req, res, next) {
+  const user = req.body;
+  try {
+    User.findByIdAndUpdate({_id:req.user.id}, user , (err, data) => {
+  
+      res.send("data updated");
 
-  router.get('/a', passport.authenticate("jwt", { session: false }), inRole(ROLES.ADMIN),
+     // res.status(400).json({"message":"Email existe"})
+  
+    });
+  } catch (error) {
+    res.status(400).send(error)
+    
+  }
+
+});
+
+router.get('/getUser', passport.authenticate("jwt", { session: false }),
+function (req, res, next) {
+  res.json({"user":req.user})
+});
+
+/* GET users listing. */
+router.get('/', passport.authenticate("jwt", { session: false }), inRole(ROLES.ADMIN),
   function (req, res, next) {
     User.find({}, function (err, users) {
       res.send(users)
     });
   });
+
+router.post('/', function (req, res, next) {
+
+  const {  isValid } = ValidateRegister(req.body);
+  try {
+    if (!isValid) {
+      res.status(404).json({message:"invalid data"});
+    } else {
+      user.findOne({ email: req.body.email }).then(async (exist) => {
+        if (exist) {
+          res.status(404).json({message:"user exist"});
+        } else {
+          const hash = bcrypt.hashSync(req.body.password, 10) //hashed password
+          req.body.password = hash;
+          const user = new User(
+            {
+              firstName: req.body.firstName,
+              lastName: req.body.lastName,
+              email: req.body.email,
+              password: req.body.password,
+              phone: req.body.phone,
+              role: req.body.role,
+              birthDate: req.body.birthDate,
+              sex: req.body.sex,
+              adress: req.body.adress,
+              premium: req.body.premium,
+              speciality: req.body.speciality
+
+            }
+          );
+          user.save().then((user)=>{
+            const verificationToken = user.generateVerificationToken();
+            mailer.sendVerifyMail(user.email,verificationToken)
+
+            res.send("user added");
+            
+          });
+          
+
+        }
+      })
+    }
+  } catch (error) {
+    res.status(404).json({message:"error"});
+  }
+});
+
+
+
+
+router.get("/:id", function (req, res, next) {
+  id = req.params.id;
+  console.log(id);
+  User.findById(id, (err, data) => {
+    console.log(data)
+    res.send(data)
+  }
+  );
+});
+
+router.put("/:id", function (req, res, next) {
+  id = req.params.id;
+  firstName = req.body.firstName
+  User.findByIdAndUpdate(id, { firstName: firstName }, (err, data) => {
+    res.send("data updated");
+  });
+});
+
+router.delete('/:id', function (req, res, next) {
+  id = req.params.id;
+  User.findByIdAndDelete(id, (err, data) => {
+    res.send("data deleted" + data);
+  });
+});
 
 module.exports = router;

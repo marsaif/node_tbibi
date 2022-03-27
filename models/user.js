@@ -23,6 +23,7 @@ var User = new Schema({
       required: true,
       default: false
   },
+  image : String ,
   restpassword : String
 });
 
