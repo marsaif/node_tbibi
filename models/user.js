@@ -24,7 +24,7 @@ var User = new Schema({
       default: false
   },
   image : String ,
-  restpassword : String
+  resetpassword : String
 });
 
 User.methods.generateVerificationToken = function () {

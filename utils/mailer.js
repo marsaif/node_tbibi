@@ -28,8 +28,8 @@ module.exports.sendVerifyMail = ((to,verificationToken) => {
     });
 })
 
-module.exports.ChangePassword = ((to,restpassword) => {
-    const url = `http://localhost:3006/reset-password/${restpassword}`
+module.exports.ChangePassword = ((to,resetpassword) => {
+    const url = `http://localhost:3006/reset-password/${resetpassword}`
     var mailOptions = {
         from: process.env.EMAIL_USERNAME,
         to: to ,

@@ -75,7 +75,7 @@ router.post('/active',
 
 
 
-  router.post('/restpassword',
+  router.post('/resetpassword',
   function (req, res, next) {
     
     const email = req.body.email
@@ -86,28 +86,28 @@ router.post('/active',
       {
         res.status(404).json({message:"user exist"});
       }
-      const restpassword = uuidv4()
-      user.restpassword=restpassword
+      const resetpassword = uuidv4()
+      user.resetpassword=resetpassword
       user.save()
-      mailer.ChangePassword(user.email,user.restpassword)
+      mailer.ChangePassword(user.email,user.resetpassword)
       res.send("email send")
     })
     
   });
 
 
-  router.post('/verify-restpassword',
+  router.post('/verify-resetpassword',
   function (req, res, next) {
     
-    const restpassword = req.body.restpassword
+    const resetpassword = req.body.resetpassword
 
-    User.findOne({restpassword:restpassword})
+    User.findOne({resetpassword:resetpassword})
     .then(user => {
       if(!user)
       {
         res.status(400).json({message:"user not found "})
       }
-      user.restpassword=""
+      user.resetpassword=""
       user.save()
       res.send({id:user.id})
     })
