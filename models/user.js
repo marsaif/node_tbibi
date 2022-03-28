@@ -24,7 +24,11 @@ var User = new Schema({
       default: false
   },
   image : String ,
-  resetpassword : String
+  resetpassword : String,
+  accepted:{
+    type: Boolean,
+    default: false
+  } 
 });
 
 User.methods.generateVerificationToken = function () {

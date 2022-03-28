@@ -32,6 +32,10 @@ router.post("/login", (req, res, next) => {
                 if (!isMatch) {
                   res.status(400).json({message:"incorrect password"})
                 } else {
+                  if(!user.accepted && user.role === "DOCTOR")
+                  {
+                    return res.status(400).json({message:"Account not accepted"})
+                  }
                   var token = jwt.sign({
                     id: user._id,
                     firstName: user.firstName,
@@ -73,8 +77,6 @@ router.post('/active',
 
   });
 
-
-
   router.post('/resetpassword',
   function (req, res, next) {
     
@@ -95,7 +97,6 @@ router.post('/active',
     
   });
 
-
   router.post('/verify-resetpassword',
   function (req, res, next) {
     
@@ -113,9 +114,7 @@ router.post('/active',
     })
     
   });
-
-
-  
+ 
   router.post('/update-password',
   function (req, res, next) {
     
@@ -210,8 +209,6 @@ router.post('/', function (req, res, next) {
 });
 
 
-
-
 router.get("/:id", function (req, res, next) {
   id = req.params.id;
   console.log(id);
@@ -237,4 +234,21 @@ router.delete('/:id', function (req, res, next) {
   });
 });
 
+router.post('/accept-doctor',
+function (req, res, next) {
+  
+  const id = req.body.id
+
+  User.findById({_id:id})
+  .then(user => {
+    if(!user)
+    {
+      res.status(400).json({message:"user not found "})
+    }
+    user.accepted=true
+    user.save()
+    res.json({message:"user accepted "})
+  })
+  
+});
 module.exports = router;
