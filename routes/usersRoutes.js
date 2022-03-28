@@ -8,9 +8,151 @@ const jwt = require('jsonwebtoken')
 const { ROLES, inRole } = require("../security/Rolemiddleware");
 const ValidateRegister = require("../validation/Register");
 const ValidateLogin = require("../validation/Login");
+var mailer =  require('../utils/mailer')
+const { v4: uuidv4 } = require('uuid');
 
 
+router.post("/login", (req, res, next) => {
+  const { isValid } = ValidateLogin(req.body);
+  try {
+    if (!isValid) {
+      res.status(400).json({message:"invalid data"});
+    } else {
+      user.findOne({ email: req.body.email })
+        .then(user => {
+          if (!user) {
+            res.status(400).json( {message:"user not found"})
+          } else {
+            if(!user.verified)
+            {
+              res.status(400).json({message:"Account not verified"})
+            }
+            bcrypt.compare(req.body.password, user.password)
+              .then(isMatch => {
+                if (!isMatch) {
+                  res.status(400).json({message:"incorrect password"})
+                } else {
+                  if(!user.accepted && user.role === "DOCTOR")
+                  {
+                    return res.status(400).json({message:"Account not accepted"})
+                  }
+                  var token = jwt.sign({
+                    id: user._id,
+                    firstName: user.firstName,
+                    email: user.email,
+                    role: user.role
+                  }, process.env.PRIVATE_KEY, { expiresIn: '24h' });
+                  res.status(200).json({
+                    accessToken: token,
+                    user: user
+                  })
+                }
+              })
+          }
+        })
+    }
+  } catch (error) {
+    res.status(404).json(error.message);
+  }
 
+})
+
+
+router.post('/active',
+  function (req, res, next) {
+    let payload = null
+    try {
+        payload = jwt.verify(
+           req.body.token,
+           process.env.USER_VERIFICATION_TOKEN_SECRET
+        );
+        console.log(payload.ID)
+          User.findOneAndUpdate({_id:payload.ID} , {verified:true},(err, data) => {
+
+            res.send("user verified");
+          } )
+      } catch (err) {
+        return res.status(500).send(err);
+    }
+
+  });
+
+  router.post('/resetpassword',
+  function (req, res, next) {
+    
+    const email = req.body.email
+
+    User.findOne({email:email})
+    .then(user => {
+      if(!user)
+      {
+        res.status(404).json({message:"user exist"});
+      }
+      const resetpassword = uuidv4()
+      user.resetpassword=resetpassword
+      user.save()
+      mailer.ChangePassword(user.email,user.resetpassword)
+      res.send("email send")
+    })
+    
+  });
+
+  router.post('/verify-resetpassword',
+  function (req, res, next) {
+    
+    const resetpassword = req.body.resetpassword
+
+    User.findOne({resetpassword:resetpassword})
+    .then(user => {
+      if(!user)
+      {
+        res.status(400).json({message:"user not found "})
+      }
+      user.resetpassword=""
+      user.save()
+      res.send({id:user.id})
+    })
+    
+  });
+ 
+  router.post('/update-password',
+  function (req, res, next) {
+    
+    const {id,password} = req.body
+
+    const hash = bcrypt.hashSync(password, 10) //hashed password
+
+    User.findByIdAndUpdate({_id:id},{password:hash})
+    .exec()
+
+   
+    res.send("password changed")
+    
+  });
+
+  
+router.put("/profile", passport.authenticate("jwt", { session: false }),
+ function (req, res, next) {
+  const user = req.body;
+  try {
+    User.findByIdAndUpdate({_id:req.user.id}, user , (err, data) => {
+  
+      res.send("data updated");
+
+     // res.status(400).json({"message":"Email existe"})
+  
+    });
+  } catch (error) {
+    res.status(400).send(error)
+    
+  }
+
+});
+
+router.get('/getUser', passport.authenticate("jwt", { session: false }),
+function (req, res, next) {
+  res.json({"user":req.user})
+});
 
 /* GET users listing. */
 router.get('/', passport.authenticate("jwt", { session: false }), inRole(ROLES.ADMIN),
@@ -22,15 +164,14 @@ router.get('/', passport.authenticate("jwt", { session: false }), inRole(ROLES.A
 
 router.post('/', function (req, res, next) {
 
-  const { errors, isValid } = ValidateRegister(req.body);
+  const {  isValid } = ValidateRegister(req.body);
   try {
     if (!isValid) {
-      res.status(404).json(errors);
+      res.status(404).json({message:"invalid data"});
     } else {
       user.findOne({ email: req.body.email }).then(async (exist) => {
         if (exist) {
-          errors.email = "user exist";
-          res.status(404).json(errors);
+          res.status(404).json({message:"user exist"});
         } else {
           const hash = bcrypt.hashSync(req.body.password, 10) //hashed password
           req.body.password = hash;
@@ -44,19 +185,26 @@ router.post('/', function (req, res, next) {
               role: req.body.role,
               birthDate: req.body.birthDate,
               sex: req.body.sex,
-              Adress: req.body.Adress,
+              adress: req.body.adress,
               premium: req.body.premium,
+              speciality: req.body.speciality
 
             }
           );
-          user.save().then();
-          res.send('user saved');
+          user.save().then((user)=>{
+            const verificationToken = user.generateVerificationToken();
+            mailer.sendVerifyMail(user.email,verificationToken)
+
+            res.send("user added");
+            
+          });
+          
 
         }
       })
     }
   } catch (error) {
-    res.status(404).json(error.message);
+    res.status(404).json({message:"error"});
   }
 });
 
@@ -86,43 +234,21 @@ router.delete('/:id', function (req, res, next) {
   });
 });
 
-router.post("/login", (req, res, next) => {
-  const { errors, isValid } = ValidateLogin(req.body);
-  try {
-    if (!isValid) {
-      res.status(404).json(errors);
-    } else {
-      user.findOne({ email: req.body.email })
-        .then(user => {
-          if (!user) {
-            errors.email = "not found user"
-            res.status(404).json(errors)
-          } else {
-            bcrypt.compare(req.body.password, user.password)
-              .then(isMatch => {
-                if (!isMatch) {
-                  errors.password = "incorrect password"
-                  res.status(404).json(errors)
-                } else {
-                  var token = jwt.sign({
-                    id: user._id,
-                    firstName: user.firstName,
-                    email: user.email,
-                    role: user.role
-                  }, process.env.PRIVATE_KEY, { expiresIn: '1h' });
-                  res.status(200).json({
-                    message: "success",
-                    token: "Bearer " + token
-                  })
-                }
-              })
-          }
-        })
+router.post('/accept-doctor',
+function (req, res, next) {
+  
+  const id = req.body.id
+
+  User.findById({_id:id})
+  .then(user => {
+    if(!user)
+    {
+      res.status(400).json({message:"user not found "})
     }
-  } catch (error) {
-    res.status(404).json(error.message);
-  }
-
-})
-
+    user.accepted=true
+    user.save()
+    res.json({message:"user accepted "})
+  })
+  
+});
 module.exports = router;

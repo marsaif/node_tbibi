@@ -23,7 +23,6 @@ var reviewRouter = require('./routes/reviewsRoutes');
 var medicalRecordRouter = require('./routes/medicalRecordRoutes');
 var PaymentRoutes = require('./routes/PaymentRoutes');
 
-
 var app = express();
 app.use(cors())
 
