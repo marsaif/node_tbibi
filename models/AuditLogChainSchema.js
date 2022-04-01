@@ -17,3 +17,4 @@ AuditLogChainSchema.virtual('id').get(function () {
 });
 exports.AuditLogChain = mongoose.model('AuditLogChain', AuditLogChainSchema);
 
+//module.exports = mongoose.model('AuditLogChain', AuditLogChainSchema);
