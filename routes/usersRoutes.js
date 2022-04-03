@@ -162,6 +162,15 @@ router.get('/', passport.authenticate("jwt", { session: false }), inRole(ROLES.A
     });
   });
 
+  /* GET users listing. */
+router.get('/lstusers',
+function (req, res, next) {
+  User.find({}, function (err, users) {
+    res.send(users)
+  });
+});
+
+
 router.post('/', function (req, res, next) {
 
   const {  isValid } = ValidateRegister(req.body);

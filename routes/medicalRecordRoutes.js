@@ -3,6 +3,8 @@ var router = express.Router();
 const User = require('../models/user');
 const medicalRecord = require('../models/medicalRecord');
 const { AuditLogBlockchain } = require('../models/chain');
+const models = require('../models/AuditLogChainSchema');
+
 const logger = require('elogger');
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -16,12 +18,44 @@ router.get('/', function (req, res, next) {
   res.send('nice');
 }); */
 
+router.get("/:patientid", function (req, res, next) {
+  id = req.params.patientid;
 
+  User.findById(id, (err, data) => {
+    models.AuditLogChain.find({ "data.patient": data._id }, (err, result) => {
+      console.log(result)
+      res.send(result)
+    })
+  }
+  );
+
+  
+
+});
+
+
+router.get("/medicalrecorddetail/:recordId", function (req, res, next) {
+  id = req.params.recordId;
+
+  User.findById(id, (err, data) => {
+    models.AuditLogChain.findById({ "_id":id }, (err, result) => {
+      console.log(result)
+      res.send(result)
+    })
+  }
+  );
+
+  
+});
+
+
+//"/medicalrecorddetail/:patientid
 router.post("/", function (req, res, next) {
 
   (async () => {
     let blockChain = new AuditLogBlockchain();
     await blockChain.initialize();
+    console.log(req.body)
     const medRec = new medicalRecord(
 
       {
@@ -31,7 +65,9 @@ router.post("/", function (req, res, next) {
         CurrentMedicalConditions: req.body.data.CurrentMedicalConditions,
         created_on: new Date().getTime(),
         DateCreation: new Date(),
-        patient: req.body.patient
+        patient: req.body.patient,
+        patientemail: req.body.emailpatient
+
         //mezel attribut mtaa tbib eli 3amel login 
       });
 
