@@ -10,6 +10,11 @@ router.get("/", function (req, res, next) {
   });
 });
 
+router.delete("/:id", async function (req, res) {
+  const deletedAppointment = await Appointment.findByIdAndDelete(req.params.id);
+  res.send(deletedAppointment);
+});
+
 router.post("/", async function (req, res) {
   const appointment = new Appointment({ ...req.body });
   await appointment.save();
