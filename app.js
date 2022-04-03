@@ -6,6 +6,8 @@ var logger = require('morgan');
 var mongoose = require('mongoose');
 var config = require('./database/db.json');
 var cors = require('cors')
+var io = require('./socket')
+
 const passport = require('passport')
 require('dotenv').config()
 
@@ -61,5 +63,6 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
 
 module.exports = app;
