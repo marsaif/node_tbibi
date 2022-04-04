@@ -4,10 +4,20 @@ const app = require("../app");
 const Appointment = require("../models/appointment");
 var router = express.Router();
 
-router.get("/", function (req, res, next) {
-  Appointment.find({}, function (err, appointments) {
-    res.send(appointments);
-  });
+// router.get("/", function (req, res, next) {
+//   Appointment.find({}, function (err, appointments) {
+//     res.send(appointments);
+//   });
+// });
+router.get("/", async (req, res) => {
+  await Appointment.find()
+    .sort({ createdAt: -1 })
+    .then((result) => {
+      res.send(result);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 });
 
 router.delete("/:id", async function (req, res) {
