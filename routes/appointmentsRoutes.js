@@ -27,8 +27,14 @@ router.delete("/:id", async function (req, res) {
 
 router.post("/", async function (req, res) {
   const appointment = new Appointment({ ...req.body });
-  await appointment.save();
-  res.status(201).send(appointment);
+  await appointment.save()
+  .then(()=>{
+     res.status(201).send(appointment);
+  })
+  .catch((error)=>{
+    console.log(error)
+  })
+ 
 });
 
 router.put("/", function (req, res, next) {
