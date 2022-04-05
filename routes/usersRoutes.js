@@ -163,9 +163,9 @@ router.get('/', passport.authenticate("jwt", { session: false }), inRole(ROLES.A
   });
 
   /* GET users listing. */
-router.get('/lstusers',
+router.get('/lstpatients',
 function (req, res, next) {
-  User.find({}, function (err, users) {
+  User.find({role:'PATIENT'}, function (err, users) {
     res.send(users)
   });
 });
@@ -195,8 +195,9 @@ router.post('/', function (req, res, next) {
               birthDate: req.body.birthDate,
               sex: req.body.sex,
               adress: req.body.adress,
-              premium: req.body.premium,
+              premium: false,
               speciality: req.body.speciality
+
 
             }
           );
