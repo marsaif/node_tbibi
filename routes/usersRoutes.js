@@ -171,6 +171,23 @@ function (req, res, next) {
 });
 
 
+
+router.post("/becomepremium", passport.authenticate("jwt", { session: false }),
+ function (req, res, next) {
+  const user = req.body;
+  try {
+    User.findByIdAndUpdate({_id:req.user.id} ,{premium:true} ,(err, data) => {
+  
+      res.send("compte premium");
+  
+    });
+  } catch (error) {
+    res.status(400).send(error)
+    
+  }
+
+});
+
 router.post('/', function (req, res, next) {
 
   const {  isValid } = ValidateRegister(req.body);
