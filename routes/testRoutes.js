@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-const Appointment = require("../models/appointment");
+const Appointment = require("../models/apptest");
 const User = require("../models/user");
 
 router.post("/", async function (req, res, next) {
