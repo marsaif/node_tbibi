@@ -22,19 +22,29 @@ router.get("/", async (req, res) => {
 
 router.delete("/:id", async function (req, res) {
   const deletedAppointment = await Appointment.findByIdAndDelete(req.params.id);
+  // await Appointment.find()
+  //   .sort({ createdAt: -1 })
+  //   .then((result) => {
+  //     res.send(result);
+  //   })
+  //   .catch((err) => {
+  //     console.log(err);
+  //   });
   res.send(deletedAppointment);
 });
 
 router.post("/", async function (req, res) {
   const appointment = new Appointment({ ...req.body });
-  await appointment.save()
-  .then(()=>{
-     res.status(201).send(appointment);
-  })
-  .catch((error)=>{
-    console.log(error)
-  })
- 
+
+  await appointment
+    .save()
+    .then(() => {
+      res.status(201).send(appointment);
+    })
+    .catch((error) => {
+      console.log(error);
+      res.send("choose other date");
+    });
 });
 
 router.put("/", function (req, res, next) {
