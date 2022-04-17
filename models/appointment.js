@@ -1,5 +1,4 @@
 var mongoose = require("mongoose");
-var uniqueValidator = require("mongoose-unique-validator");
 
 var Schema = mongoose.Schema;
 
@@ -14,6 +13,5 @@ var Appointment = new Schema(
   },
   { timestamps: true }
 );
-Appointment.plugin(uniqueValidator);
 
 module.exports = mongoose.model("appointments", Appointment);
