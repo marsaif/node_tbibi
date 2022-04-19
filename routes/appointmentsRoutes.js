@@ -2,7 +2,7 @@ var express = require("express");
 const res = require("express/lib/response");
 const app = require("../app");
 const Appointment = require("../models/appointment");
-const passport = require('passport')
+const passport = require('passport');
 var router = express.Router();
 
 // router.get("/", function (req, res, next) {
