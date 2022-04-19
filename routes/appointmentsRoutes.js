@@ -2,6 +2,7 @@ var express = require("express");
 const res = require("express/lib/response");
 const app = require("../app");
 const Appointment = require("../models/appointment");
+const passport = require("passport");
 var router = express.Router();
 
 // router.get("/", function (req, res, next) {
@@ -9,47 +10,57 @@ var router = express.Router();
 //     res.send(appointments);
 //   });
 // });
-router.get("/", async (req, res) => {
-  await Appointment.find()
-    .sort({ createdAt: -1 })
-    .then((result) => {
-      res.send(result);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-});
+router.get(
+  "/",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    const user = req.user;
+    await Appointment.find({ doctor: user })
+      .sort({ createdAt: -1 })
+      .then((result) => {
+        res.send(result);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+);
 
 router.delete("/:id", async function (req, res) {
   const deletedAppointment = await Appointment.findByIdAndDelete(req.params.id);
   res.send(deletedAppointment);
 });
 
-router.post("/", async function (req, res) {
-  const appointment = new Appointment({ ...req.body });
-  console.log(appointment.DateAppointment);
-  // appointment.DateAppointment = appointment.DateAppointment.toLocaleString(
-  //   "en-US",
-  //   { timeZone: "Africa/Tunis" }
-  // );
-  appointment.DateAppointment.setHours(
-    appointment.DateAppointment.getHours() + 1
-  );
-  appointment.DateAppointment.setSeconds(0);
-  console.log(appointment.DateAppointment);
-  await appointment
-    .save()
-    .then(() => {
-      console.log(appointment.DateAppointment);
+router.post(
+  "/",
+  passport.authenticate("jwt", { session: false }),
+  async function (req, res) {
+    const doctor = req.user;
+    const appointment = new Appointment({ ...req.body });
+    appointment.doctor = doctor;
+    console.log(appointment.DateAppointment);
+    // appointment.DateAppointment = appointment.DateAppointment.toLocaleString(
+    //   "en-US",
+    //   { timeZone: "Africa/Tunis" }
+    // );
+    appointment.DateAppointment.setHours(
+      appointment.DateAppointment.getHours() + 1
+    );
+    appointment.DateAppointment.setSeconds(0);
+    console.log(appointment.DateAppointment);
+    await appointment
+      .save()
+      .then(() => {
+        console.log(appointment.DateAppointment);
+        res.status(201).send(appointment);
+      })
+      .catch((error) => {
+        console.log(error);
 
-      res.status(201).send(appointment);
-    })
-    .catch((error) => {
-      console.log(error);
-
-      res.send("choose other date");
-    });
-});
+        res.send("choose other date");
+      });
+  }
+);
 
 router.put("/", function (req, res, next) {
   id = req.body.id;
