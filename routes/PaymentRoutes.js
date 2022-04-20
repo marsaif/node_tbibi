@@ -3,6 +3,7 @@ var router = express.Router();
 const stripe = require('stripe')('sk_test_51KeJ0kJ2m5v52NCmZcWcu1iowjnBMaBnuKlOKdxZEyAnUa1rqCwHKKTQeW7JLYSWuQ5WJpQQMOgnP5pBRXmpb4aB00U6Jnen2t');
 const User = require('../models/user');
 var nodemailer = require('nodemailer');
+var moment = require('moment');
 
 var transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -15,15 +16,17 @@ var transporter = nodemailer.createTransport({
 
 
 router.post('/create-checkout-session', async (req, res) => {
+    console.log("++++++++")
+    const { subs, token, meUser } = req.body.body
 
     var mailOptions = {
         from: process.env.EMAIL_USERNAME,
-        to: "saieftaher@gmail.com" ,
+        to: meUser.email,
         subject: 'Payment to Tbibi platform went succesfully ',
         text: "Payment to Tbibi platform went succesfully thank you for your confidence :)"
     };
 
-    const { subs, token } = req.body.body
+
 
     return stripe.customers.create({
         email: token.email,
@@ -39,9 +42,9 @@ router.post('/create-checkout-session', async (req, res) => {
 
     })
         .then(result => {
-            User.findByIdAndUpdate("6233aad8a26fa80a00cecf07", { premium: true }, (err, data) => {
+            User.findByIdAndUpdate(meUser._id, { premium: true }, (err, data) => {
                 res.send("data updated");
-                //mezl bech njib el user eli 3mal upgrade
+                console.log(data)
             })
 
 
@@ -49,7 +52,7 @@ router.post('/create-checkout-session', async (req, res) => {
                 if (error) {
                     console.log(error);
                 } else {
-                    console.log('Email sent: ' + info.response);
+                    console.log('Email sent:  ' + info.response);
                 }
             });
 
@@ -57,38 +60,53 @@ router.post('/create-checkout-session', async (req, res) => {
 })
 
 router.get("/soldecomptebancaire", function (req, res, next) {
-    stripe.balance.retrieve(function(err, balance) {
-        console.log(balance.available[0]);
+    var lst = []
+    stripe.balance.retrieve(function (err, balance) {
+        //console.log(balance.available[0]);
         res.json(balance.available[0].amount)
 
-      });
-     
-      });
+    });
+
     
+     stripe.balanceTransactions.list({ limit: 3 })
+        .autoPagingEach(async function (transaction) {
+
+            var time = moment(transaction.created * 1000).format("DD-MM-YYYY");
+            lst.push({"key":time})
+            transaction.created = moment(transaction.created * 1000).format("DD-MM-YYYY");
+            let lastElement = lst[lst.length - 1];
+
+            console.log(lastElement);
+
+        });
+   
+
+});
+
 
 router.get("/premuimstats", function (req, res, next) {
-var array=[]
-  User.count( {  premium:true }, (err, count) => {
-        console.log(count);
-        array.push({'nonpremuim':count})
+    var array = []
+    User.count({ premium: true }, (err, count) => {
+        //  console.log(count);
+        array.push({ 'nonpremuim': count })
         res.json(count)
 
     });
 
- 
-  });
 
-  
+});
+
+
 router.get("/nonpremuimstats", function (req, res, next) {
-    var array=[]
-      User.count( {  premium:false }, (err, count) => {
-            console.log(count);
-            array.push({'premuim':count})
-            res.json(count)
-    
-        });
-    
-     
-      });
+    var array = []
+    User.count({ premium: false }, (err, count) => {
+        console.log(count);
+        array.push({ 'premuim': count })
+        res.json(count)
+
+    });
+
+
+});
 
 module.exports = router;
