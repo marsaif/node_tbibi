@@ -10,7 +10,70 @@ const ValidateRegister = require("../validation/Register");
 const ValidateLogin = require("../validation/Login");
 var mailer =  require('../utils/mailer')
 const { v4: uuidv4 } = require('uuid');
+const multer = require("multer");
+const fs = require("fs");
+let path = require("path");
 
+
+
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "images");
+  },
+  filename: function (req, file, cb) {
+    cb(null, uuidv4() + "-" + Date.now() + path.extname(file.originalname));
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+  const allowedFileTypes = ["image/jpeg", "image/jpg", "image/png"];
+  if (allowedFileTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+
+  }
+};
+
+let upload = multer({ storage, fileFilter });
+
+router.post("/upload-photo", upload.single("photo"), async (req, res) => {
+  const photo = req.file.filename;
+  console.log(photo)
+  const oldUser = await User.findById(req.body.id);
+  const updatedUser = await User.findOneAndUpdate(
+    { _id: req.body.id },
+    { image :photo }
+  );
+  if (!updatedUser) {
+    return res.status(400).json({ message: "user does not exist" });
+  }
+  fs.unlink(`images/${oldUser.image}`, () => console.log("success"));
+  return res.status(200).json(photo);
+});
+
+
+router.post('/statrole', async function (req , res , next) {
+  let admins = await User.find({role : "ADMIN"})
+  let doctors = await User.find({role : "DOCTOR"})
+  let patients = await User.find({role : "PATIENT"})
+
+  res.send({admins:admins.length , doctors : doctors.length , patients:patients.length})
+
+
+}
+)
+
+router.post('/statverif', async function (req , res , next) {
+  let verify = await User.find({verified : true})
+  let notVerify = await User.find({verified : false})
+
+  res.send({verify : verify.length , notVerify : notVerify.length})
+
+
+}
+)
 
 router.post("/login", (req, res, next) => {
   const { isValid } = ValidateLogin(req.body);
@@ -287,4 +350,6 @@ function (req, res, next) {
   })
   
 });
+
+
 module.exports = router;

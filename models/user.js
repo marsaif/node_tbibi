@@ -23,7 +23,10 @@ var User = new Schema({
       required: true,
       default: false
   },
-  image : String ,
+  image :{
+    type: String,
+    default: ""
+  } ,
   resetpassword : String,
   accepted:{
     type: Boolean,
