@@ -5,7 +5,6 @@ const Conversation = require("../models/conversation");
 const User = require("../models/user");
 const passport = require("passport");
 const conversation = require("../models/conversation");
-const { Builder, By, Key, until, Capabilities } = require("selenium-webdriver");
 // this function is add a new conversation
 router.post(
   "/",
@@ -188,12 +187,5 @@ router.get(
     }
   }
 );
-
-router.get("/test", async function (req, res, next) {
-  var driver = new Builder().withCapabilities(Capabilities.chrome()).build();
-
-  driver.get("https://www.med.tn/medecin");
-  var elems = await driver.findElements(By.className("card-doctor-top"));
-});
 
 module.exports = router;
