@@ -4,7 +4,8 @@ const Appointment = require("../models/apptest");
 const Conversation = require("../models/conversation");
 const User = require("../models/user");
 const passport = require("passport");
-
+const conversation = require("../models/conversation");
+const { Builder, By, Key, until, Capabilities } = require("selenium-webdriver");
 // this function is add a new conversation
 router.post(
   "/",
@@ -123,5 +124,76 @@ router.get(
     }
   }
 );
+
+router.get(
+  "/mystat",
+  passport.authenticate("jwt", { session: false }),
+  async function (req, res, next) {
+    try {
+      total = 0;
+      if (req.user.role == "DOCTOR") {
+        var conversations = await Conversation.find({
+          doctor: req.user,
+        });
+      } else {
+        var conversations = await Conversation.find({
+          patient: req.user,
+        });
+      }
+      for (const conv of conversations) {
+        total = total + conv.messages.length;
+      }
+      res.send({ total: total });
+    } catch (error) {
+      res.send({ msg: error });
+    }
+  }
+);
+
+router.get(
+  "/allstat",
+  passport.authenticate("jwt", { session: false }),
+  async function (req, res, next) {
+    try {
+      let total = 0;
+      var conversations = await Conversation.find({});
+      for (const conv of conversations) {
+        total = total + conv.messages.length;
+      }
+      res.send({ total: total });
+    } catch (error) {
+      res.send({ msg: error });
+    }
+  }
+);
+
+router.get(
+  "/statmonths",
+  passport.authenticate("jwt", { session: false }),
+  async function (req, res, next) {
+    try {
+      let total = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      console.log(total.length);
+      var conversations = await Conversation.find({});
+      for (const conv of conversations) {
+        for (const msg of conv.messages) {
+          let date = new Date(msg.createdDate);
+          console.log(date.getMonth());
+          total[date.getMonth()] = total[date.getMonth()] + 1;
+        }
+      }
+      res.send({ total: total });
+    } catch (error) {
+      res.send({ msg: error });
+    }
+  }
+);
+
+router.get("/test", async function (req, res, next) {
+  var driver = new Builder().withCapabilities(Capabilities.chrome()).build();
+
+  driver.get("https://www.med.tn/medecin");
+  var elems = await driver.findElements(By.className("card-doctor-top"));
+});
 
 module.exports = router;

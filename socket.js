@@ -12,7 +12,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3006",
+    origin: "*",
     methods: ["GET", "POST"],
   },
 });
@@ -77,14 +77,25 @@ io.on("connection", (socket) => {
 
   // video chat socket
 
-  socket.on("callUser", (data) => {
-    socket
-      .to(data.userToCall)
-      .emit("hey", { signal: data.signalData, from: data.from });
+  socket.on("callUser", async (data) => {
+    let user = await User.findOne({ _id: data.from });
+    socket.broadcast.emit("hey", {
+      to: data.userToCall,
+      from: data.from,
+      name: user.firstName,
+    });
   });
 
   socket.on("acceptCall", (data) => {
-    socket.to(data.to).emit("callAccepted", data.signal);
+    socket.broadcast.emit("callAccepted", data);
+  });
+
+  socket.on("sendSignal", (data) => {
+    socket.broadcast.emit("recieveSignal", data.signal);
+  });
+
+  socket.on("sendResponseSignal", (data) => {
+    socket.broadcast.emit("receiveResponseSignal", data.signal);
   });
 
   socket.on("disconnect", () => {
