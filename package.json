@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "chromedriver": "^100.0.0",
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",
     "crypto-js": "^4.1.1",
@@ -26,9 +27,9 @@
     "nodemon": "^2.0.15",
     "passport": "^0.5.2",
     "passport-jwt": "^4.0.0",
+    "selenium-webdriver": "^3.6.0",
     "socket.io": "^4.4.1",
     "stripe": "^8.209.0",
     "uuid": "^8.3.2",
-    "validator": "^13.7.0"
-  }
+    "validator": "^13.7.0"  }
 }

@@ -12,9 +12,15 @@ var mailer =  require('../utils/mailer')
 const { v4: uuidv4 } = require('uuid');
 const multer = require("multer");
 const fs = require("fs");
+const scraping = require('../utils/scraping')
+
 let path = require("path");
 
+router.get("/medtn", function (req, res, next) {
+  scraping()
+  
 
+});
 
 
 const storage = multer.diskStorage({
@@ -341,6 +347,7 @@ function (req, res, next) {
   })
   
 });
+
 
 
 module.exports = router;
