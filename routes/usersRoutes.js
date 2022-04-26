@@ -233,6 +233,15 @@ function (req, res, next) {
   });
 });
 
+  /* GET doctors listing. */
+  router.get('/lstdoctors',
+  function (req, res, next) {
+    User.find({role:'DOCTOR'}, function (err, users) {
+      res.send(users)
+    });
+  });
+  
+  
 
 
 router.post("/becomepremium", passport.authenticate("jwt", { session: false }),
