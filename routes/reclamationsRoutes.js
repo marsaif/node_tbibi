@@ -18,9 +18,19 @@ router.put("/:id", function (req, res, next) {
   });
 });
 
+router.put("/updateReclamationDescription/:id", function (req, res, next) {
+  console.log(req.body.description)
+  id = req.params.id;
+
+
+  Reclamation.findByIdAndUpdate(id, { description: req.body.description }, (err, data) => {
+    res.send("data updated");
+  }); 
+});
+
+
 router.delete('/:id', function (req, res, next) {
   id = req.params.id;
-  console.log("fi dekteee+++++++++++++"+id)
   Reclamation.findByIdAndDelete(id, (err, data) => {
     res.send("data deleted" + data);
   });
