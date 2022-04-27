@@ -5,6 +5,7 @@ var Reclamation = new Schema(
   {
     date: Date,
     description: String,
+    read:Boolean,
     patient: { type: Schema.Types.ObjectId, ref: "users" },
     doctor: { type: Schema.Types.ObjectId, ref: "users" },
   },

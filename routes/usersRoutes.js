@@ -321,7 +321,7 @@ router.get("/:id", function (req, res, next) {
     console.log(data)
     res.send(data)
   }
-  );
+  )
 });
 
 router.put("/:id", function (req, res, next) {
