@@ -7,6 +7,9 @@ var mongoose = require("mongoose");
 var config = require("./database/db.json");
 var cors = require("cors");
 var io = require("./socket");
+const axios = require('axios')
+const schedule = require('node-schedule');
+
 
 const passport = require("passport");
 require("dotenv").config();
@@ -54,6 +57,7 @@ require("./security/passport")(passport);
 app.use(function (req, res, next) {
   next(createError(404));
 });
+
 
 // error handler
 app.use(function (err, req, res, next) {
