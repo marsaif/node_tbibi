@@ -61,6 +61,7 @@ const getdoctors = async (speciality) => {
     }
   }
   console.log("speciality not found !");
+  return []
 };
 
 const geturl = async (url, driver, driver2) => {
