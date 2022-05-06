@@ -45,7 +45,7 @@ const getdoctors = async (speciality) => {
     .setChromeOptions(options)
     .build();
 
-  let url = "https://tunisie-medicale.com/index.php/docteur";
+  let url = "https://tunisie--medicale-com.translate.goog/index.php/docteur?_x_tr_sl=fr&_x_tr_tl=en&_x_tr_hl=fr";
   await driver.get(url);
   let div = await driver
     .findElement(By.id("speciality"))
