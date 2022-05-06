@@ -16,9 +16,9 @@ const scraping = require('../utils/scraping')
 
 let path = require("path");
 
-router.get("/medtn", function (req, res, next) {
-  scraping()
-  
+router.get("/medtn/:speciality", async function (req, res, next) {
+  var data =await scraping(req.params.speciality)
+  res.send(data)
 
 });
 
