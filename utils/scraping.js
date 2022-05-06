@@ -36,13 +36,13 @@ const getdoctors = async (speciality) => {
   options.addArguments("--no-sandbox");
 
   var driver = new webdriver.Builder()
+    .forBrowser("chrome")
     .setChromeOptions(options)
-    .withCapabilities(webdriver.Capabilities.chrome())
     .build();
 
   var driver2 = new webdriver.Builder()
+    .forBrowser("chrome")
     .setChromeOptions(options)
-    .withCapabilities(webdriver.Capabilities.chrome())
     .build();
 
   let url = "https://tunisie-medicale.com/index.php/docteur";
