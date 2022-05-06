@@ -24,6 +24,8 @@ var medicalRecordRouter = require("./routes/medicalRecordRoutes");
 var PaymentRoutes = require("./routes/PaymentRoutes");
 var testRoutes = require("./routes/testRoutes");
 var conversationRouter = require("./routes/converstationRoutes");
+var symptomRouter = require("./routes/symptomRoutes");
+
 var app = express();
 app.use(cors());
 
@@ -47,6 +49,7 @@ app.use("/medicalrecord", medicalRecordRouter);
 app.use("/payments", PaymentRoutes);
 app.use("/test", testRoutes);
 app.use("/conversation", conversationRouter);
+app.use("/symptoms", symptomRouter);
 
 app.use(passport.initialize());
 require("./security/passport")(passport);
