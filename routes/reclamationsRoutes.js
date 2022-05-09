@@ -5,9 +5,20 @@ const User = require('../models/user');
 
 /* GET recla listing. */
 router.get('/', function(req, res, next) {
+ 
   Reclamation.find({read:false}, function (err, users) {
     res.send(users)
-  }).populate('patient').populate('doctor');;
+    console.log(users)
+  }).populate('doctor').populate('patient');;
+});
+
+
+router.get('/recl/allReclamationsForDashboard', function(req, res, next) {
+ 
+  Reclamation.find({}, function (err, users) {
+    res.send(users)
+    console.log(users)
+  }).populate('doctor').populate('patient');;
 });
 
 router.put("/:id", function (req, res, next) {
