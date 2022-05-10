@@ -1,12 +1,13 @@
 var mongoose = require("mongoose");
-var uniqueValidator = require("mongoose-unique-validator");
 
 var Schema = mongoose.Schema;
 
 var Appointment = new Schema(
   {
     DateAppointment: { type: Date, required: true, unique: true },
+    patient: { type: Schema.Types.ObjectId, ref: "users" },
     patientName: { type: String },
+    patientEmail: { type: String },
     patientAge: { type: Number },
     patientPhone: { type: String },
     gender: { type: String },
@@ -14,6 +15,5 @@ var Appointment = new Schema(
   },
   { timestamps: true }
 );
-Appointment.plugin(uniqueValidator);
 
 module.exports = mongoose.model("appointments", Appointment);
