@@ -33,6 +33,7 @@ var User = new Schema(
       type: Boolean,
       default: false,
     },
+      reviews:[String],
     ratings: {
       type: mongoose.Mixed, // A mixed type object to handle ratings. Each star level is represented in the ratings object
       1: Number, //  the key is the weight of that star level

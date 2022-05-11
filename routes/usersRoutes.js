@@ -270,20 +270,33 @@ router.put(
   (req, res, next) => {
     const id = req.params.id;
     let rating = req.body;
+    console.log(rating)
     const r = rating.value;
+    const ro = rating.rev
     let key = `ratings.${r}`;
-    user
-      .findByIdAndUpdate(id, { $inc: { [key]: 1 } }, { new: true })
-      .then(() => {
-        res.send(200);
-      })
-      .catch((err) => {
-        console.log(err.message);
-      });
-    console.log(id);
-    console.log(rating.value);
+   user.findById(id).then(res=>{
+       let review = res.reviews
+      review.unshift(ro)
+     // user.findByIdAndUpdate(id, {reviews: review})
+     return review
+   }).then((result)=>{
+     user
+         .findByIdAndUpdate(id, { $inc: { [key]: 1 } , reviews: result}, { new: true })
+         .then(() => {
+           res.send(200);
+         })
+         .catch((err) => {
+           console.log(err.message);
+         });
+     console.log(id);
+     console.log(rating.value);
 
-    res.status(200);
+     res.status(200);
+
+   })
+
+
+
   }
 );
 
