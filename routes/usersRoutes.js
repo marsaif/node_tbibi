@@ -231,16 +231,9 @@ router.get("/lstdoctors", function (req, res, next) {
 });
 
 router.get("/lstDoctor", function (req, res, next) {
-  User.find({ role: "DOCTOR" }, function (err, users) {
-    // let pro = users[1].get("ratings", null, {getters: false});
-    // const getReviewNum = (elt) => {
-    //     let rat = elt.get("ratings", null, {getters: false});
-    //     let review = 0
-    //     for (let i = 1; i < 6; i++) {
-    //         review += rat[i]
-    //     }
-    //     return review
-    // }
+  User.find({ role: "DOCTOR" }).sort( {ratings:-1}).then(users=> {
+
+
     let reviewArr = [];
     users.forEach((elt) => {
       let prod = elt.get("ratings", null, { getters: false });
@@ -261,7 +254,7 @@ router.get("/lstDoctor", function (req, res, next) {
       data: users,
       revArr: reviewArr,
     });
-  }).sort({ ratings: 1 });
+  })
 });
 
 router.put(

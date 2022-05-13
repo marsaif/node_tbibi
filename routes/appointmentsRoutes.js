@@ -38,7 +38,7 @@ const job = schedule.scheduleJob("0 10 * * *", async function () {
             const date = item.DateAppointment;
 
             await getDoctor(doctorId).then((doctorName) => {
-              let url = `https://www.tunisiesms.tn/client/Api/Api.aspx?fct=sms&key=yDsirmd31t/-/fpktbJLI4rkXWdn7oTU880Qe38RVL/-/paFJ/kxjj4/-/LcSXTHoSaZ9neibHYWVY3yRKRLncngPuslzWoO5B88hVpo6pG1Mr1IM=&mobile=216${number}&sender=Tbiby.Tn&sms=Mr ${PatientName} vous aves un rendez vous demain le ${date.toString().slice(16,21)} avec Dr ${doctorName}`;
+              let url = ``;
               url = encodeURI(url);
               console.log("URL: " + url);
               axios
